@@ -1,0 +1,14 @@
+# Python virtual env
+venv/
+.env/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# n8n credentials / secrets
+*.env
+credentials.json

@@ -1,0 +1,745 @@
+{
+  "name": "AI Smart Gmail Auto-Reply System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "includeSpamTrash": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ddd778a8-d325-43d5-8f38-3beea3f48b11",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l6KHoEjN2bYQ4i2E",
+          "name": "gmail-auto-reply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+            "assignments": [
+    {
+      "name": "sender",
+      "value": "={{ $json.From.match(/<(.+?)>/)[1] }}",
+      "type": "string"
+    },
+    {
+      "name": "subject",
+      "value": "={{ $json.Subject }}",
+      "type": "string"
+    },
+    {
+      "name": "body",
+      "value": "={{ $json.snippet }}",
+      "type": "string"
+    }
+  ]
+       },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bdf38fc4-b716-4e58-b78f-aae3ffec0d96",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Classify this email into ONE category only:SupportSalesHRGeneralReply with ONLY one word.No explanation.Subject:{{$json.subject}}Body:{{$json.body}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        400,
+        0
+      ],
+      "id": "21e9c673-49f4-47c0-8977-73140e30f6a2",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        176
+      ],
+      "id": "62aea81d-c4be-4683-af1f-a45650cfbf93",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "j0l0lByQUdKJn1Jv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4b790559-ac95-4199-93c6-294a53999cf0",
+                    "leftValue": "={{ $json.text }}\n",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "daa7ece6-c1c3-41d4-8d28-94d8f05e40bb",
+                    "leftValue": "Support",
+                    "rightValue": "Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7c64ad61-bad6-4976-a1b0-fa8b8c5189eb",
+                    "leftValue": "Sales",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "77ee923b-8b9f-44c5-a17a-e16ca5ea20e4",
+                    "leftValue": "HR",
+                    "rightValue": "HR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "12d3ca78-0769-438e-9c49-f24b269c626c",
+                    "leftValue": "General",
+                    "rightValue": "General",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "313dda42-0548-4eda-a787-d86d88f5d7fd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a professional email reply.\n\nEmail Subject:\n{{$json.subject}}\n\nEmail Content:\n{{$json.body}}\n\nReply politely and clearly.\nKeep it professional and helpful.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1104,
+        -96
+      ],
+      "id": "0c0f24a1-cc96-45ad-885d-e2f977148e79",
+      "name": "support"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Reply to this support email professionally.\nBe helpful and reassuring.\n\nSubject: {{$json.subject}}\nEmail: {{$json.body}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "a5b15a77-47fd-4cdb-a330-26c1af5ff74d",
+      "name": "Sales"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Reply politely to a job or HR email.\nKeep professional tone.\n\nSubject: {{$json.subject}}\nEmail: {{$json.body}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1104,
+        96
+      ],
+      "id": "d53724b7-6a84-406a-a336-5b9d44f5fb79",
+      "name": "HR"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a polite acknowledgement reply.\n\nSubject: {{$json.subject}}\nEmail: {{$json.body}}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1104,
+        192
+      ],
+      "id": "e6ca8028-0406-45de-ba3e-f1ad0902f776",
+      "name": "General"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        768,
+        272
+      ],
+      "id": "dfcefea3-5a9f-4d01-97cb-26bfcc37445a",
+      "name": "gemini engine",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "j0l0lByQUdKJn1Jv",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f3a2b60-43ab-4295-9330-21b33d50ac2c",
+              "leftValue": "={{$json.sender}}",
+              "rightValue": "shameertmdevop@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1456,
+        -240
+      ],
+      "id": "310af633-e95e-4b4f-8131-25725b297865",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f3a2b60-43ab-4295-9330-21b33d50ac2c",
+              "leftValue": "={{$json.sender}}",
+              "rightValue": "shameertmdevop@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1456,
+        -64
+      ],
+      "id": "28784689-ad2f-466e-9be7-1f7cf15c3e0b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f3a2b60-43ab-4295-9330-21b33d50ac2c",
+              "leftValue": "={{$json.sender}}",
+              "rightValue": "shameertmdevop@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1456,
+        176
+      ],
+      "id": "98315e3f-c2a9-4857-bc6d-362f87e33bd9",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7f3a2b60-43ab-4295-9330-21b33d50ac2c",
+              "leftValue": "={{$json.sender}}",
+              "rightValue": "shameertmdevop@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1456,
+        368
+      ],
+      "id": "7979a487-7e05-4762-b271-29f27b6a3a32",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Edit Fields\"].json[\"Sender\"] }}",
+        "subject": "=Re: {{ $node[\"Edit Fields\"].json[\"Subject\"] }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        -288
+      ],
+      "id": "12f2b374-93f4-464e-b62c-7d9059ae0ee4",
+      "name": "Send a message",
+      "webhookId": "b38d4ad1-1805-46dc-ab5b-211317ea344e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l6KHoEjN2bYQ4i2E",
+          "name": "gmail-auto-reply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Edit Fields\"].json[\"Sender\"] }}",
+        "subject": "=Re: {{ $node[\"Edit Fields\"].json[\"Subject\"] }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        -32
+      ],
+      "id": "7bb4b8c4-7b71-4580-ade8-012c5d51b23e",
+      "name": "Send a message1",
+      "webhookId": "b38d4ad1-1805-46dc-ab5b-211317ea344e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l6KHoEjN2bYQ4i2E",
+          "name": "gmail-auto-reply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Edit Fields\"].json[\"Sender\"] }}",
+        "subject": "=Re: {{ $node[\"Edit Fields\"].json[\"Subject\"] }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        128
+      ],
+      "id": "26785613-cb42-4e32-88ed-39610ae1056e",
+      "name": "Send a message2",
+      "webhookId": "b38d4ad1-1805-46dc-ab5b-211317ea344e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l6KHoEjN2bYQ4i2E",
+          "name": "gmail-auto-reply"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Edit Fields\"].json[\"Sender\"] }}",
+        "subject": "=Re: {{ $node[\"Edit Fields\"].json[\"Subject\"] }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        384
+      ],
+      "id": "2a252e86-9435-4567-9940-cd1285b1115c",
+      "name": "Send a message3",
+      "webhookId": "b38d4ad1-1805-46dc-ab5b-211317ea344e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l6KHoEjN2bYQ4i2E",
+          "name": "gmail-auto-reply"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "General",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini engine": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sales",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "General",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "HR",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "support",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "support": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HR": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d2fcb28b-e4f4-4445-afa3-3ac106e1df75",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "582b3695ff7bfd085b301e96857526dfcff82dd240562d257abcd7ef20c4bf5e"
+  },
+  "id": "iBCFqNczVEZiBi65",
+  "tags": []
+}
