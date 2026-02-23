@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 1. Project Title  -    AI Gmail Auto Reply System using n8n + Gemini
@@ -39,3 +40,7 @@ Automation Workflow
 3. Add Gemini API key
 4. Activate workflow
 
+=======
+# gmail-ai-auto-reply-n8n
+AI-powered Gmail auto reply automation using n8n and Google Gemini.
+>>>>>>> 64893fec175fabc5bf667fdad0c9b58268c4cebf
