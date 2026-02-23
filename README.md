@@ -10,6 +10,7 @@ Workfloworchestration
 
 3. Architecture Diagram - 
 
+<img width="1536" height="1024" alt="ChatGPT Image Feb 24, 2026, 12_07_56 AM" src="https://github.com/user-attachments/assets/a7b448af-48d5-4fe8-a74d-c398a2b99526" />
 
 
 
@@ -43,4 +44,4 @@ Automation Workflow
 =======
 # gmail-ai-auto-reply-n8n
 AI-powered Gmail auto reply automation using n8n and Google Gemini.
->>>>>>> 64893fec175fabc5bf667fdad0c9b58268c4cebf
+>>>>>>> 
